@@ -11,7 +11,17 @@ export default defineConfig({
 	resolve: {
 		alias: {
 			"~@semi-bot": path.join(__dirname, "./node_modules/@semi-bot"),
-			"@assets": path.join(__dirname, "./src/assets")
+			"@assets": path.join(__dirname, "./src/assets"),
+			"@": path.resolve(__dirname, "src") // 添加路径别名
+		}
+	},
+	server: {
+		proxy: {
+			"/api": {
+				target: "http://localhost:3000",
+				changeOrigin: true,
+				rewrite: (path) => path.replace(/^\/api/, "")
+			}
 		}
 	}
 });

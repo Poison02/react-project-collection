@@ -23,7 +23,7 @@ function NavBar() {
 	return (
 		<Nav
 			mode={"horizontal"}
-			className="cloud-layout-navbar px-24"
+			className="cloud-layout-navbar px-32"
 			items={[
 				{ itemKey: "/", text: "首页" },
 				{ itemKey: "/category", text: "分类" }
