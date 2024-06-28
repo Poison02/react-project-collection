@@ -18,7 +18,7 @@ const Banner = () => {
 	}, []);
 
 	return (
-		<div>
+		<>
 			{bannerList.length > 0 && (
 				<Carousel
 					className="w-full h-96"
@@ -30,24 +30,19 @@ const Banner = () => {
 					{bannerList.map((item, index) => {
 						return (
 							<div
-								key={item.targetId}
+								key={index}
 								className="px-32 bg-cover bg-center"
 								style={{
 									backgroundImage: `url(${item.imageUrl}?imageView&blur=40x20)`
 								}}
 							>
-								<img
-									className="w-full"
-									key={index}
-									src={item.imageUrl}
-									alt=""
-								/>
+								<img className="w-full" src={item.imageUrl} alt="" />
 							</div>
 						);
 					})}
 				</Carousel>
 			)}
-		</div>
+		</>
 	);
 };
 

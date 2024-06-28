@@ -1,30 +1,42 @@
-import { getPersonalized } from "@/http/api";
-import { PersonalizedItem } from "@/types/home";
+import { getHotTag, getPlaylistByTag } from "@/http/api";
+import { Playlist, Tag } from "@/types/home";
 import { chunk } from "@/utils";
 import { Card, Carousel, Typography } from "@douyinfe/semi-ui";
 import { useEffect, useState } from "react";
+import classNames from "classnames";
 
 const { Title } = Typography;
 
 const Personalized = () => {
-	const [personalizedList, setPersonalizedList] = useState<
-		PersonalizedItem[][]
-	>([]);
+	const [tagList, setTagList] = useState<Tag[]>([]);
+	const [curTag, setCurTag] = useState<string>("全部");
+	const [personalizedList, setPersonalizedList] = useState<Playlist[][]>([]);
+
+	const getList = async (tag = "全部") => {
+		const res = await getPlaylistByTag({ limit: 20, cat: tag });
+		if (res.code === 200) {
+			const newList = chunk(res.playlists || [], 5);
+			setPersonalizedList(newList || []);
+		}
+	};
 
 	useEffect(() => {
-		const getList = async () => {
-			const res = await getPersonalized({ limit: 20 });
+		const getTags = async () => {
+			const res = await getHotTag();
 			if (res.code === 200) {
-				console.log(res);
-				const newList = chunk(res.result || [], 5);
-				setPersonalizedList(newList);
+				const newList = res.tags ? [{ id: -1, name: "全部" }, ...res.tags] : [];
+				setTagList(newList?.slice(0, 5) || []);
 			}
 		};
+		getTags();
+	}, []);
+
+	useEffect(() => {
 		getList();
 	}, []);
 
 	return (
-		<div>
+		<>
 			<Title
 				heading={2}
 				ellipsis={{ showTooltip: true }}
@@ -32,43 +44,66 @@ const Personalized = () => {
 			>
 				热门推荐
 			</Title>
-
-			{personalizedList?.length > 0 && (
-				<Carousel
-					className="w-full h-80"
-					speed={1000}
-					animation="fade"
-					theme="dark"
-					showIndicator={false}
-					autoPlay={false}
-					arrowType="hover"
-				>
-					{personalizedList.map((item, index) => {
+			{tagList.length > 0 && (
+				<div className="flex items-center justify-center my-4">
+					{tagList.map((item) => {
 						return (
 							<div
-								key={index}
-								className="px-32 flex items-center justify-between"
-							>
-								{item.map((childItem) => {
-									const { id, picUrl, name } = childItem || {};
-									return (
-										<Card
-											key={id}
-											className="w-56"
-											cover={<img alt="example" src={picUrl} />}
-										>
-											<Title heading={5} ellipsis={{ showTooltip: true }}>
-												{name}
-											</Title>
-										</Card>
-									);
+								key={item.id}
+								className={classNames("tag-item mx-4 cursor-pointer", {
+									active: curTag === item.name
 								})}
+								onClick={async () => {
+									await getList(item.name);
+									setCurTag(item.name || "全部");
+								}}
+							>
+								{item.name}
 							</div>
 						);
 					})}
-				</Carousel>
+				</div>
 			)}
-		</div>
+
+			<div key={curTag}>
+				{personalizedList?.length > 0 && (
+					<Carousel
+						className="w-full h-80"
+						speed={1000}
+						animation="fade"
+						theme="dark"
+						showIndicator={false}
+						autoPlay={false}
+						arrowType="hover"
+					>
+						{personalizedList.map((item, index) => {
+							return (
+								<div
+									key={`${curTag}${index}`}
+									className="px-32 flex items-center justify-between"
+								>
+									{item.map((childItem) => {
+										const { id, coverImgUrl, name } = childItem || {};
+										return (
+											<Card
+												key={id}
+												className="w-56"
+												cover={<img alt="example" src={coverImgUrl} />}
+												shadows="hover"
+											>
+												<Title heading={5} ellipsis={{ showTooltip: true }}>
+													{name}
+												</Title>
+											</Card>
+										);
+									})}
+								</div>
+							);
+						})}
+					</Carousel>
+				)}
+			</div>
+		</>
 	);
 };
 
