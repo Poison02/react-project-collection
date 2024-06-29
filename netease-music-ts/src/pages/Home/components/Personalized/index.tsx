@@ -4,6 +4,7 @@ import { chunk } from "@/utils";
 import { Card, Carousel, Typography } from "@douyinfe/semi-ui";
 import { useEffect, useState } from "react";
 import classNames from "classnames";
+import Image from "@/components/Image";
 
 const { Title } = Typography;
 
@@ -50,9 +51,12 @@ const Personalized = () => {
 						return (
 							<div
 								key={item.id}
-								className={classNames("tag-item mx-4 cursor-pointer", {
-									active: curTag === item.name
-								})}
+								className={classNames(
+									"tag-item mx-4 cursor-pointer hover:text-primary",
+									{
+										active: curTag === item.name
+									}
+								)}
 								onClick={async () => {
 									await getList(item.name);
 									setCurTag(item.name || "全部");
@@ -88,7 +92,7 @@ const Personalized = () => {
 											<Card
 												key={id}
 												className="w-56"
-												cover={<img alt="example" src={coverImgUrl} />}
+												cover={<Image src={coverImgUrl} />}
 												shadows="hover"
 											>
 												<Title heading={5} ellipsis={{ showTooltip: true }}>

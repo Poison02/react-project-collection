@@ -3,6 +3,7 @@ import { PersonalizedNewSongItem } from "@/types/home";
 import { chunk } from "@/utils";
 import { useEffect, useState } from "react";
 import { Card, Carousel, Typography } from "@douyinfe/semi-ui";
+import Image from "@/components/Image";
 
 const { Title, Text } = Typography;
 
@@ -58,7 +59,7 @@ const PersonalizedNewSong = () => {
 										<Card
 											key={id}
 											className="w-56"
-											cover={<img alt="example" src={picUrl} />}
+											cover={<Image src={picUrl} />}
 											shadows="hover"
 										>
 											<Title heading={6} ellipsis={{ showTooltip: true }}>

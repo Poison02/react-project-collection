@@ -3,7 +3,9 @@ import {
 	PersonalizedRes,
 	PersonalizedNewSongRes,
 	HotTagRes,
-	PlaylistRes
+	PlaylistRes,
+	ToplistRes,
+	PlaylistDetailRes
 } from "@/types/home";
 import { http } from "./request";
 
@@ -39,4 +41,17 @@ export const getPlaylistByTag = async (params: {
 	cat?: string;
 }) => {
 	return await http.get<PlaylistRes>("/top/playlist/highquality", { params });
+};
+
+// 获取所有榜单列表
+export const getToplist = async () => {
+	return await http.get<ToplistRes>("/toplist");
+};
+
+// 获取歌单详情
+export const getPlaylistTrackList = async (params: {
+	id: number;
+	limit?: number;
+}) => {
+	return await http.get<PlaylistDetailRes>("/playlist/track/all", { params });
 };
