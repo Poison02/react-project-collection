@@ -2,8 +2,8 @@ import { getPersonalizedNewSong } from "@/http/api";
 import { PersonalizedNewSongItem } from "@/types/home";
 import { chunk } from "@/utils";
 import { useEffect, useState } from "react";
-import { Card, Carousel, Typography } from "@douyinfe/semi-ui";
-import Image from "@/components/Image";
+import { Carousel, Typography } from "@douyinfe/semi-ui";
+import SongCard from "@/components/SongCard";
 
 const { Title, Text } = Typography;
 
@@ -56,19 +56,12 @@ const PersonalizedNewSong = () => {
 										song = { artists: [] }
 									} = childItem || {};
 									return (
-										<Card
+										<SongCard
 											key={id}
-											className="w-56"
-											cover={<Image src={picUrl} />}
-											shadows="hover"
-										>
-											<Title heading={6} ellipsis={{ showTooltip: true }}>
-												{name}
-											</Title>
-											{song?.artists && song?.artists?.length > 0 && (
-												<Text>{song?.artists[0]?.name}</Text>
-											)}
-										</Card>
+											coverImgUrl={picUrl}
+											songName={name}
+											artistsName={song?.artists && song?.artists[0]?.name}
+										/>
 									);
 								})}
 							</div>

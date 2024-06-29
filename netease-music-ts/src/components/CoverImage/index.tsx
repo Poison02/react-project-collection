@@ -3,7 +3,7 @@ import { IconPlayCircle } from "@douyinfe/semi-icons";
 
 type IImageProps = ImgHTMLAttributes<HTMLImageElement>;
 
-function Image(props: IImageProps) {
+function CoverImage(props: IImageProps) {
 	return (
 		<div className="group w-full h-full relative overflow-hidden">
 			<IconPlayCircle
@@ -18,4 +18,4 @@ function Image(props: IImageProps) {
 	);
 }
 
-export default Image;
+export default CoverImage;

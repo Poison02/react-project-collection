@@ -26,7 +26,7 @@ function NavBar() {
 			className="cloud-layout-navbar px-32"
 			items={[
 				{ itemKey: "/", text: "首页" },
-				{ itemKey: "/category", text: "分类" }
+				{ itemKey: "/category", text: "歌单" }
 			]}
 			selectedKeys={selectKeys}
 			onClick={(item) => {
