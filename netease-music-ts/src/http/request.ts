@@ -44,7 +44,6 @@ function RequestBuilder(config: RequestConfig) {
 		(request: AxiosRequestConfig) => {
 			// 显示loading
 			showLoading();
-			console.log("全局请求拦截器");
 			return request;
 		},
 		(err: any) => err
@@ -71,16 +70,27 @@ function RequestBuilder(config: RequestConfig) {
 	// 全局响应拦截器
 	instance.interceptors.response.use(
 		(response: AxiosResponse) => {
-			console.log("全局响应拦截器");
 			// 关闭loading
 			hideLoading();
+			const { code, msg } = response?.data || {};
+			if (code !== 200) {
+				// 处理错误情况
+				return Promise.reject({
+					code,
+					message: msg
+				});
+			}
 			// 返回值为 res.data ，即后端接口返回的数据，减少解构的层级，以及统一响应数据格式
 			return response.data;
 		},
 		(err: any) => {
 			// 关闭loading
 			hideLoading();
-			return err;
+			const { code, message } = err || {};
+			return Promise.reject({
+				code,
+				message
+			});
 		}
 	);
 	return instance;

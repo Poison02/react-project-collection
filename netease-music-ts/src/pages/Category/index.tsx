@@ -1,86 +1,80 @@
 import { getCategoryList, getPlaylistByTag } from "@/http/api";
-import { CategoryMapList } from "@/types/category";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import CategoryTagList from "./components/CategoryTagList";
 import { Playlist } from "@/types/home";
 import { IconClose } from "@douyinfe/semi-icons";
+import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import PlayerList from "./components/PlayerList";
 
 const initialCat = "全部";
 
 function Category() {
-	const [categoryList, setCategoryList] = useState<CategoryMapList[]>([]);
+	// const [categoryList, setCategoryList] = useState<CategoryMapList[]>([]);
 	const [curCategory, setCurCategory] = useState<string>(initialCat);
 	const [playList, setPlayList] = useState<Playlist[]>([]);
-	const [offset, setOffset] = useState<number>(0);
-	const [hasMore, setHasMore] = useState<boolean>(false);
+	// const [offset, setOffset] = useState<number>(0);
+	// const [hasMore, setHasMore] = useState<boolean>(false);
+	const offsetRef = useRef<number>(0);
 
 	// 获取歌单列表
-	const getPlayList = async ({
-		cat,
-		offset
-	}: {
-		cat: string;
-		offset: number;
-	}) => {
-		try {
-			setCurCategory(cat);
-			setOffset(offset);
-			const res = await getPlaylistByTag({
-				limit: 50,
-				cat,
-				offset: offset * 50,
-				order: "hot"
-			});
-			if (res.code === 200) {
-				if (offset > 0) {
-					setPlayList([...playList, ...(res.playlists || [])]);
-				} else {
-					setPlayList(res.playlists || []);
-				}
-				setHasMore(res.more || false);
-			}
-		} catch (e) {
-			console.log(e);
-		}
-	};
-
-	// 加载更多
-	const onLoadMore = () => {
-		getPlayList({ cat: curCategory, offset: offset + 1 });
-	};
-
-	useEffect(() => {
-		const getList = async () => {
-			try {
-				const res = await getCategoryList();
-				const { code, all, sub, categories = {} } = res || {};
+	const { data: categoryList = [] } = useQuery(
+		["categoryList"],
+		getCategoryList,
+		{
+			select: (res) => {
+				const { code, sub, categories = {} } = res || {};
 				if (code === 200) {
 					const tmpList = Object.entries(categories)?.map(([key, val]) => {
-						const list = sub?.filter(
-							(item: any) => item.category === Number(key)
-						);
+						const list = sub?.filter((item) => item.category === Number(key));
 						return {
 							code: key,
 							name: val,
 							list
 						};
 					});
-					setCategoryList(tmpList);
+					return tmpList;
 				}
-			} catch (e) {
-				console.log(e);
+				return [];
 			}
-		};
-		getList();
-		getPlayList({ cat: initialCat, offset: 0 });
-	}, []);
+		}
+	);
+
+	const { data, fetchNextPage, hasNextPage } = useInfiniteQuery(
+		["playlist", curCategory],
+		async (obj) => {
+			const res = await getPlaylistByTag({
+				limit: 50,
+				cat: curCategory,
+				offset: obj.pageParam
+			});
+			return res;
+		},
+		{
+			getNextPageParam: (lastPage) => {
+				if (lastPage.more) {
+					return offsetRef.current * 50;
+				}
+				return;
+			}
+		}
+	);
+
+	useEffect(() => {
+		if (data?.pages && data?.pages?.length > 0) {
+			const list = data?.pages.reduce((t, c) => {
+				return [...t, ...(c.playlists || [])];
+			}, [] as Playlist[]);
+			setPlayList(list);
+		}
+	}, [data?.pages]);
+
 	return (
 		<div className="category-wrapper">
 			<CategoryTagList
 				categoryList={categoryList}
 				onTagClick={(cat) => {
-					getPlayList({ cat, offset: 0 });
+					setCurCategory(cat);
+					offsetRef.current = 0;
 				}}
 				curCategory={curCategory}
 			/>
@@ -89,7 +83,8 @@ function Category() {
 				{curCategory !== initialCat && (
 					<IconClose
 						onClick={() => {
-							getPlayList({ cat: initialCat, offset: 0 });
+							setCurCategory(initialCat);
+							offsetRef.current = 0;
 						}}
 						className="ml-2 cursor-pointer hover:text-primary"
 					/>
@@ -97,8 +92,11 @@ function Category() {
 			</h2>
 			<PlayerList
 				playList={playList}
-				hasMore={hasMore}
-				onLoadMore={onLoadMore}
+				hasMore={hasNextPage}
+				onLoadMore={() => {
+					offsetRef.current += 1;
+					fetchNextPage();
+				}}
 			/>
 		</div>
 	);

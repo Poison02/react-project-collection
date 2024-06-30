@@ -4,7 +4,7 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
+		"dev": "vite --host",
 		"build": "tsc && vite build",
 		"preview": "vite preview",
 		"lint": "npm run lint:script && npm run lint:style",
@@ -13,16 +13,19 @@
 		"postinstall": "husky install"
 	},
 	"dependencies": {
-		"react": "^18.2.0",
-		"react-dom": "^18.2.0",
-		"react-router-dom": "^6.3.0",
 		"@douyinfe/semi-icons": "^2.18.2",
 		"@douyinfe/semi-illustrations": "^2.18.2",
 		"@douyinfe/semi-ui": "^2.18.0",
 		"@semi-bot/semi-theme-doucreator": "^1.0.18",
+		"@tanstack/react-query": "^4.3.7",
+		"@tanstack/react-query-devtools": "^4.3.9",
+		"add": "^2.0.6",
 		"axios": "^0.27.2",
 		"classnames": "^2.3.1",
-		"vite-plugin-svgr": "2.2.1"
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"react-error-boundary": "^3.1.4",
+		"react-router-dom": "^6.3.0"
 	},
 	"devDependencies": {
 		"@commitlint/cli": "^17.1.1",
@@ -55,7 +58,8 @@
 		"typescript": "^4.6.4",
 		"vite": "^3.0.7",
 		"vite-plugin-eslint": "^1.8.1",
-		"vite-plugin-stylelint": "^3.0.7"
+		"vite-plugin-stylelint": "^3.0.7",
+		"vite-plugin-svgr": "^2.2.1"
 	},
 	"lint-staged": {
 		"**/*.{js,jsx,tsx,ts}": [
