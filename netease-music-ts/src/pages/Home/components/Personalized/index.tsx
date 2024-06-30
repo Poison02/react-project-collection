@@ -1,6 +1,6 @@
 import { getHotTag, getHighqualityPlaylistByTag } from "@/http/api";
 import { chunk } from "@/utils";
-import { Carousel, Typography } from "@douyinfe/semi-ui";
+import { Carousel, Typography, Skeleton } from "@douyinfe/semi-ui";
 import { useState } from "react";
 import classNames from "classnames";
 import SongCard from "@/components/SongCard";
@@ -21,7 +21,7 @@ const Personalized = () => {
 		}
 	});
 
-	const { data: personalizedList = [] } = useQuery(
+	const { data: personalizedList = [], isLoading } = useQuery(
 		["HighqualityPlaylist", curTag],
 		() => getHighqualityPlaylistByTag({ limit: 20, cat: curTag }),
 		{
@@ -67,37 +67,51 @@ const Personalized = () => {
 			)}
 
 			<div key={curTag}>
-				{personalizedList?.length > 0 && (
-					<Carousel
-						className="w-full h-80"
-						speed={1000}
-						animation="fade"
-						theme="dark"
-						showIndicator={false}
-						autoPlay={false}
-						arrowType="hover"
-					>
-						{personalizedList.map((item, index) => {
-							return (
-								<div
-									key={`${curTag}${index}`}
-									className="px-32 flex items-center justify-between"
-								>
-									{item.map((childItem) => {
-										const { id, coverImgUrl, name } = childItem || {};
-										return (
-											<SongCard
-												key={id}
-												coverImgUrl={coverImgUrl}
-												songName={name}
-											/>
-										);
-									})}
-								</div>
-							);
-						})}
-					</Carousel>
-				)}
+				<Skeleton
+					placeholder={
+						<div className="px-32 flex items-center justify-between h-80">
+							<Skeleton.Image className="w-56" />
+							<Skeleton.Image className="w-56" />
+							<Skeleton.Image className="w-56" />
+							<Skeleton.Image className="w-56" />
+							<Skeleton.Image className="w-56" />
+						</div>
+					}
+					loading={isLoading}
+					active
+				>
+					{personalizedList?.length > 0 && (
+						<Carousel
+							className="w-full h-80"
+							speed={1000}
+							animation="fade"
+							theme="dark"
+							showIndicator={false}
+							autoPlay={false}
+							arrowType="hover"
+						>
+							{personalizedList.map((item, index) => {
+								return (
+									<div
+										key={`${curTag}${index}`}
+										className="px-32 flex items-center justify-between"
+									>
+										{item.map((childItem) => {
+											const { id, coverImgUrl, name } = childItem || {};
+											return (
+												<SongCard
+													key={id}
+													coverImgUrl={coverImgUrl}
+													songName={name}
+												/>
+											);
+										})}
+									</div>
+								);
+							})}
+						</Carousel>
+					)}
+				</Skeleton>
 			</div>
 		</>
 	);
