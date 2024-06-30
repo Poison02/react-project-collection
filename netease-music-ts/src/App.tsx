@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Suspense, lazy } from "react";
-import { Button, Empty, Spin } from "@douyinfe/semi-ui";
+import { Button, Empty } from "@douyinfe/semi-ui";
 import { routes } from "./routes";
 import {
 	QueryClient,
@@ -13,6 +12,7 @@ import {
 	IllustrationConstruction,
 	IllustrationConstructionDark
 } from "@douyinfe/semi-illustrations";
+import NotFoundPage from "@/pages/404";
 
 const queryClient = new QueryClient({
 	defaultOptions: {
@@ -21,8 +21,6 @@ const queryClient = new QueryClient({
 		}
 	}
 });
-
-const NotFoundPage = lazy(() => import("./pages/404/index"));
 
 function App() {
 	return (
@@ -67,17 +65,7 @@ function App() {
 											<Route
 												key={path}
 												path={path}
-												element={
-													<Suspense
-														fallback={
-															<div className="w-full h-full flex items-center justify-center">
-																<Spin size="large" />
-															</div>
-														}
-													>
-														<route.component />
-													</Suspense>
-												}
+												element={<route.component />}
 											>
 												{children.map((childRoute) => {
 													const { path } = childRoute;
@@ -85,17 +73,7 @@ function App() {
 														<Route
 															key={path}
 															path={path}
-															element={
-																<Suspense
-																	fallback={
-																		<div className="w-full h-full flex items-center justify-center">
-																			<Spin size="large" />
-																		</div>
-																	}
-																>
-																	<childRoute.component />
-																</Suspense>
-															}
+															element={<childRoute.component />}
 														/>
 													);
 												})}
@@ -106,22 +84,11 @@ function App() {
 										<Route
 											key={path}
 											path={path}
-											element={
-												<Suspense fallback={<Spin />}>
-													<route.component />
-												</Suspense>
-											}
+											element={<route.component />}
 										/>
 									);
 								})}
-								<Route
-									path="*"
-									element={
-										<Suspense fallback={<Spin />}>
-											<NotFoundPage />
-										</Suspense>
-									}
-								/>
+								<Route path="*" element={<NotFoundPage />} />
 							</Routes>
 						</BrowserRouter>
 					</ErrorBoundary>
